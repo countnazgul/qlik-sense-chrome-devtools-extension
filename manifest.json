@@ -1,0 +1,16 @@
+{
+    "name": "Qlik Sense Console",
+    "version": "0.1",
+    "description": "A bare-bones example of communication between devtools and an inspected page",
+    "devtools_page": "devtools.html",
+    "permissions": [
+        "tabs",
+        "http://*/*",
+        "https://*/*",
+        "tabs"
+    ],
+    "manifest_version": 2,
+    "background":{
+      "scripts" : ["background.js"]
+    }
+}
