@@ -17,7 +17,11 @@ document.querySelector('#insertmessagebutton').addEventListener('click', functio
     sendObjectToInspectedPage({action: "script", content: "messageback-script.js"});
 }, false);
 */
-
+  var activeApp = null;
+  var qsGlobal = null;
+  var server = '';
+  var isSecure = '';
+  var app = '';
 
 $( document ).ready(function() {
   
@@ -55,17 +59,13 @@ $( document ).ready(function() {
      }
   });   
   
-  var server = '';
-  var isSecure = '';
-  var app = '';
-  
   var port = chrome.extension.connect({
         name: "Sample Communication"
   });
   
   port.postMessage(chrome.devtools.inspectedWindow.tabId);
   port.onMessage.addListener(function (url) {
-  console.log(url);
+  //console.log(url);
 
     if(url.indexOf('https://') > -1) {
       isSecure = true;
@@ -74,69 +74,46 @@ $( document ).ready(function() {
     }
     
     url = url + '/';
-    server = url.substring(url.indexOf('://') + 3, url.indexOf('/',url.indexOf('://') + 3));
-    //app = url.substring(url.indexOf('app/') + 4, url.indexOf('/',url.indexOf('app/') + 4));
-    app = 'd14e5c9c-d328-4acf-86d2-4b2c2fda82cc';
     
-    // var data = {
-    //   'issecure' : isSecure,
-    //   'server' : server,
-    //   'app': app
-    // };
-    $('#qsserver').text(server);
+    if(url.indexOf('/app/') > -1) {
+      server = url.substring(url.indexOf('://') + 3, url.indexOf('/',url.indexOf('://') + 3));
+      app = url.substring(url.indexOf('app/') + 4, url.indexOf('/',url.indexOf('app/') + 4)); 
+      $('#qsserver').text(server);
+      //console.log(app);
+    } else {
+      // App is not available!!!!! disable
+    }
+    
+    if(app.indexOf('%5CApps%5C') > -1) {
+      app = decodeURIComponent(app.substring(app.indexOf('%5CApps%5C') + 10, url.indexOf('/',app.indexOf('%5CApps%5C') + 10)));
+    }
+
     
   var config = {
     host: server,
     isSecure: isSecure
   };
   
-  var activeApp = null;
-  //Connect to a server using the config object.
-  //Connecting without a config object automatically assumes a instance of Qlik Sense Desktop
-  //When connected we are returned with a handle that represents the Global class.
-  qsocks.Connect(config).then(function(global) {
-    //We can now interact with the global class, for example fetch the document list.
-    //qsocks mimics the Engine API, refer to the Engine API documentation for available methods.
-    
-    //global.getDocList().then(function(docList) {
-      //docList.forEach(function(doc) {
-        //$('#documents').append($("<option />").val(doc.qDocId).text(doc.qTitle));
-        //console.log(doc);
-        
-        //if(doc.qTitle === "Sales Discovery") {
-          //var docId = doc.qDocId;
-          //var docName = doc.qDocName;
-          
-          global.openDoc(app).then(function(doc) {
-            activeApp = doc;
-            
-            doc.getAppProperties().then(function(props) {
-              console.log(props);
-              $('#qsdoc').text(props.qTitle);
-            });
-            
-            //console.log(app);
-            doc.getTablesAndKeys({"qcx": 1000,"qcy": 1000},{"qcx": 0,"qcy": 0},30,true,false).then(function(docDataObjects) {
-              
-              GetFields(docDataObjects);
-              console.log(docDataObjects);
 
-              
-            });
-          });
-        //}
-      });    
-    
-    
-    
-    //console.log(data);
+  qsocks.Connect(config).then(function(global) {
+    qsGlobal = global;
+      global.qvVersion().then(function(version) {
+        $('#qsversion').text('');
+        $('#qsversion').text('QS Version: ' + version);
+        //console.log(version);
+      });
+    });
   });
   
   
   
   function RunCalculation() {
-    var dim = $('#dimension').val();
-    var expr = $('#expression').val();
+    //var dim = $('#dimensions').val();
+    var dim = $("#dimensions option:selected").text();
+    if(dim === '-- Empty --') {
+      dim = '=0';
+    }
+     var expr = $('#expression').val();
     
     var obj = {
       "qInfo": {
@@ -173,32 +150,49 @@ $( document ).ready(function() {
     activeApp.createSessionObject(obj).then(function(list) {
       list.getLayout().then(function(layout) {
         console.log(layout);
+        
       });
     });
     
   }
 
-function GetFields(docDataObjects) {
-  var allFields = [];
-  
-  var qtr = docDataObjects.qtr;
-  for( i = 0; i <qtr.length; i++) {
-    var tableName = qtr[i].qName;
-    var noOfRows = qtr[i].qNoOfRows;
-    var fields = qtr[i].qFields;
+  function GetFields(docDataObjects) {
+    var allFields = [];
     
-    for(var f = 0; f < fields.length; f++) {
-      allFields.push(fields[f].qName);
+    var qtr = docDataObjects.qtr;
+    for( i = 0; i <qtr.length; i++) {
+      var tableName = qtr[i].qName;
+      var noOfRows = qtr[i].qNoOfRows;
+      var fields = qtr[i].qFields;
+      
+      for(var f = 0; f < fields.length; f++) {
+        allFields.push(fields[f].qName);
+      }
+      //var test = l;
+      //return allFields;
     }
-    //var test = l;
-    //return allFields;
+    
+    for(var a = 0; a < allFields.length; a++) {
+      $('#dimensions').append($("<option />").val('').text(allFields[a]));  
+    }     
+    
   }
   
-  for(var a = 0; a < allFields.length; a++) {
-    $('#dimensions').append($("<option />").val('').text(allFields[a]));  
-  }     
-  
-}
+  function OpenDoc() {
+      qsGlobal.openDoc(app).then(function(doc) {
+        activeApp = doc;
+        
+        doc.getAppProperties().then(function(props) {
+          console.log(props);
+          $('#qsdoc').text(props.qTitle);
+        });
+        
+        doc.getTablesAndKeys({"qcx": 1000,"qcy": 1000},{"qcx": 0,"qcy": 0},30,true,false).then(function(docDataObjects) {
+          GetFields(docDataObjects);
+          //console.log(docDataObjects);
+        });
+      });
+  }
 
   $( "#calculate" ).on( "click", function() {
     RunCalculation();
@@ -209,15 +203,9 @@ function GetFields(docDataObjects) {
     $('#connectionResult').text('test');
   });
   
-  $( "#openDoc" ).on( "click", function() {
+  $( "#qdocopen" ).on( "click", function() {
+    OpenDoc();
     //$('#connectionResult').text();
     //$('#connectionResult').text('test');
   });  
-  
-  
-
-//    });
-  //});  
-
-  
 });
