@@ -24,6 +24,7 @@ document.querySelector('#insertmessagebutton').addEventListener('click', functio
   var app = '';
 
 $( document ).ready(function() {
+  // $('#my-final-table').dynatable();
   
   $('texta  rea#expression').val('Expression');
   
@@ -62,6 +63,11 @@ $( document ).ready(function() {
   var port = chrome.extension.connect({
         name: "Sample Communication"
   });
+  
+  function getServerandUrl () {
+    
+  }
+  
   
   port.postMessage(chrome.devtools.inspectedWindow.tabId);
   port.onMessage.addListener(function (url) {
@@ -147,8 +153,19 @@ $( document ).ready(function() {
       }
     };
     
+    
     activeApp.createSessionObject(obj).then(function(list) {
-      list.getLayout().then(function(layout) {
+      list.getLayout().then(function(layout) {  //'/qListObjectDef', l
+        var row = layout.qListObject.qDataPages[0].qMatrix;
+        var res = '<table><tr><td>'+'Dim'+'</td><td>'+'Calc'+'</td></tr>';
+        $('#result').html('');
+        for(var r = 0; r < row.length; r++) {
+          var dr = row[r];
+          res += '<table><tr><td>'+dr[0].qText+'</td><td>'+dr[1].qText+'</td></tr>';
+          //d.push( { Dimension:dr[0].qText, Calculation:dr[1].qText } );  
+        }
+        $('#result').html(res);
+
         console.log(layout);
         
       });
