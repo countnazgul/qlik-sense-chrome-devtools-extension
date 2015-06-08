@@ -23,6 +23,15 @@ Chrome Dev Tools seems the right place for this actions (or Chrome App but this 
 * enter the expression in the text area
 * press "Calculate"
 
+### Future development
+
+* error messages
+* multiple dimensions
+* view calculations history and option to re-execute them
+* sorting the result table
+* export the results
+* different visualizations?
+
 ### Reminder!
 
 * The extension is still under development and there is a chance that will not work on 100%. 
