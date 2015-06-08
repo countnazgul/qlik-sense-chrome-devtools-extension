@@ -1,46 +1,24 @@
-// This one acts in the context of the panel in the Dev Tools
-//
-// Can use
-// chrome.devtools.*
-// chrome.extension.*
-/*
-document.querySelector('#executescript').addEventListener('click', function() {
-    sendObjectToInspectedPage({action: "code", content: "console.log('Inline script executed')"});
-}, false);
+var activeApp = null;
+var qsGlobal = null;
+var server = '';
+var isSecure = '';
+var app = '';
 
-document.querySelector('#insertscript').addEventListener('click', function() {
-    sendObjectToInspectedPage({action: "script", content: "inserted-script.js"});
-}, false);
-
-document.querySelector('#insertmessagebutton').addEventListener('click', function() {
-    sendObjectToInspectedPage({action: "code", content: "document.body.innerHTML='<button>Send message to DevTools</button>'"});
-    sendObjectToInspectedPage({action: "script", content: "messageback-script.js"});
-}, false);
-*/
-  var activeApp = null;
-  var qsGlobal = null;
-  var server = '';
-  var isSecure = '';
-  var app = '';
-
-$( document ).ready(function() {
-  // $('#my-final-table').dynatable();
+$( document ).ready(function() {  
+  $('texta  rea#expression').val('Expression');  
+  $('#dimensions').append($("<option />").val('').text('-- Empty dimension --'));
   
-  $('texta  rea#expression').val('Expression');
-  
-  $('#dimensions').append($("<option />").val('').text('-- Pick measure --'));
-  $('#dimensions').append($("<option />").val('').text('-- Empty --'));
-  
+  $('#qdocopen').prop('disabled', true);
   $('#dimensions').prop('disabled', true);
   $('#expression').prop('disabled', true);
   $('#calculate').prop('disabled', true);
   
-  $('#documentStatus').text('Not open');
+  //$('#documentStatus').text('Not open');
   
   $( "#qdocopen" ).on( "click", function() {
     
-    $('#documentStatus').text('Open');
-    $('#documentStatus').toggleClass('connected');
+    //$('#documentStatus').text('Open');
+    //$('#documentStatus').toggleClass('connected');
     
     $('#dimensions').prop('disabled', false);
     $('#expression').prop('disabled', false);
@@ -85,6 +63,8 @@ $( document ).ready(function() {
       server = url.substring(url.indexOf('://') + 3, url.indexOf('/',url.indexOf('://') + 3));
       app = url.substring(url.indexOf('app/') + 4, url.indexOf('/',url.indexOf('app/') + 4)); 
       $('#qsserver').text(server);
+      $('#qsdoc').text(decodeURIComponent(app));
+      $('#qdocopen').prop('disabled', false);
       //console.log(app);
     } else {
       // App is not available!!!!! disable
@@ -116,7 +96,7 @@ $( document ).ready(function() {
   function RunCalculation() {
     //var dim = $('#dimensions').val();
     var dim = $("#dimensions option:selected").text();
-    if(dim === '-- Empty --') {
+    if(dim === '-- Empty dimension --') {
       dim = '=0';
     }
      var expr = $('#expression').val();
@@ -157,17 +137,23 @@ $( document ).ready(function() {
     activeApp.createSessionObject(obj).then(function(list) {
       list.getLayout().then(function(layout) {  //'/qListObjectDef', l
         var row = layout.qListObject.qDataPages[0].qMatrix;
-        var res = '<table><tr><td>'+'Dim'+'</td><td>'+'Calc'+'</td></tr>';
+        var res = '<table class="sortable" id="resultTable" style="white-space: nowrap"><thead><tr><th>'+'Dim'+'</th><th>'+'Calc'+'</th></tr></thead><tbody>';
+        
         $('#result').html('');
+        
         for(var r = 0; r < row.length; r++) {
           var dr = row[r];
-          res += '<table><tr><td>'+dr[0].qText+'</td><td>'+dr[1].qText+'</td></tr>';
-          //d.push( { Dimension:dr[0].qText, Calculation:dr[1].qText } );  
+          res += '<tr><td>'+dr[0].qText+'</td><td>'+dr[1].qText+'</td></tr>';            
         }
-        $('#result').html(res);
-
-        console.log(layout);
         
+        res += '</tbody></table>';
+        $('#result').html(res);
+        
+        var resultTable = $('#resultTable');
+
+        //$('#resultTable').addClass('datagrid'); 
+
+        console.log(layout);        
       });
     });
     
@@ -177,22 +163,21 @@ $( document ).ready(function() {
     var allFields = [];
     
     var qtr = docDataObjects.qtr;
-    for( i = 0; i <qtr.length; i++) {
-      var tableName = qtr[i].qName;
-      var noOfRows = qtr[i].qNoOfRows;
+    for(var i = 0; i <qtr.length; i++) {
+      //var tableName = qtr[i].qName;
+      //var noOfRows = qtr[i].qNoOfRows;
       var fields = qtr[i].qFields;
       
       for(var f = 0; f < fields.length; f++) {
         allFields.push(fields[f].qName);
       }
-      //var test = l;
-      //return allFields;
+      
+      allFields.sort();
     }
     
     for(var a = 0; a < allFields.length; a++) {
       $('#dimensions').append($("<option />").val('').text(allFields[a]));  
-    }     
-    
+    }         
   }
   
   function OpenDoc() {
