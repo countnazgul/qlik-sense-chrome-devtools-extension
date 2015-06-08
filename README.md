@@ -25,3 +25,5 @@ Chrome Dev Tools seems the right place for this actions (or Chrome App but this 
 
 * The extension is still under development and there is a chance that will not work on 100%. 
 * At the moment is tested only agains QS Desktop edition (QS Server tests are on the way)
+
+![Screenshot](https://raw.githubusercontent.com/countnazgul/qlik-sense-chrome-devtools-extension/master/QlikSenseConsole.png)
