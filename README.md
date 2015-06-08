@@ -2,6 +2,8 @@
 
 Chrome extension that can be used when developing in Qlik Sense. The extension will add one extra tab in Chrome dev tools (when Ctrl+Shift+i is pressed). The tab can be used to run calculations against the active QS document (the one that is open in the current Chrome tab)
 
+Thanks to Alexander Karlsson ([mindspank](https://github.com/mindspank)) for [qsocks](https://github.com/mindspank/qsocks).
+
 ### Why?
 In Qlikview when there is need to test some expression usually textbox object is used. In Sense textbox still can be used but if you have taken all the work space (usually the case) to add one textbox just to test something involves re-sizing at least one object, creating textbox, few clicks to reach the actual expression editor and then check the result. And if you want to create table to check the result the situation is even more complicated. 
 
