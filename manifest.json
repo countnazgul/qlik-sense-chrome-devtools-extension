@@ -1,16 +1,24 @@
 {
     "name": "Qlik Sense Console",
-    "version": "0.3",
-    "description": "A bare-bones example of communication between devtools and an inspected page",
+    "version": "0.7.3",
+    "description": "Run calculations agains Qlik Sense (desktop and server) from Chrome Dev Tools",
     "devtools_page": "devtools.html",
     "permissions": [
         "tabs",
         "http://*/*",
-        "https://*/*",
-        "tabs"
+        "https://*/*"
     ],
     "manifest_version": 2,
     "background":{
       "scripts" : ["background.js"]
-    }
+    },
+    "icons": {      
+      "16": "icons/icon-16.png",
+      "24": "icons/icon-24.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "64": "icons/icon-64.png",
+      "128": "icons/icon-128.png"      
+   },
+     "offline_enabled": true
 }

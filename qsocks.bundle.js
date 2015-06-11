@@ -263,6 +263,9 @@ function GenericObject(connection, handle) {
 GenericObject.prototype.getLayout = function() {
     return this.connection.ask(this.handle, 'GetLayout', arguments).then(function(msg) {
         return msg.qLayout;
+    }, function(e) {
+        console.log(e);
+        return e;
     });
 };
 GenericObject.prototype.getListObjectData = function(Path, Pages) {
