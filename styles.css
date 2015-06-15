@@ -2,14 +2,15 @@ body, input, textarea, button, select {
   font-family: Roboto;
   font-size: 13px;
 }
-      
+
 .datagrid {
     padding-top: 10px;
+    width: 100%;
 }
 .datagrid table {
     border-collapse: collapse;
     text-align: left;
-    width: 100%;    
+    width: 100%;
 }
 .datagrid {
     font: normal 12px/150% Roboto;
@@ -48,4 +49,10 @@ body, input, textarea, button, select {
 }
 .datagrid table tbody tr:last-child td {
     border-bottom: none;
+}
+
+.dimensions {
+  float: left;
+  margin-left: 5px;
+  margin-top: 5px;
 }
