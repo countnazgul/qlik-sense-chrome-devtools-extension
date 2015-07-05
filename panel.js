@@ -5,8 +5,11 @@ var isSecure = false;
 var app = '';
 
 $( document ).ready(function() {
+
+
+
   $('texta  rea#expression').val('Expression');
-  $('#dimensions').append($("<option />").val('').text('-- Empty dimension --'));
+  $('#dimensions').append($("<option />").val('-- Empty dimension --').text('-- Empty dimension --'));
 
   $('#qdocopen').prop('disabled', true);
   $('#dimensions').prop('disabled', true);
@@ -85,14 +88,20 @@ $( document ).ready(function() {
 */
 
   function RunCalculation() {
-    //var dim = $("#dimensions option:selected").text();
-    //if(dim === '-- Empty dimension --') {
-    //  dim = "=''";
-    //}
-
     var dims = [];
-
+    var dims1 = [];
     var expr = $('#expression').val();
+    var dimenstionsCount = $('.dimensions').length;
+
+    $('.dimensions option:selected').each(function() {
+      var fieldDimension = $(this).text();
+      dims1.push(fieldDimension);
+      if(dimenstionsCount == 1) {
+          dims.push(fieldDimension);
+      } else if(fieldDimension != '-- Empty dimension --') {
+        dims.push(fieldDimension);
+      }
+    });
 
     var cubedef = {
       "qInfo": {
@@ -133,37 +142,38 @@ $( document ).ready(function() {
             "qTop": 0,
             "qLeft": 0,
             "qHeight": 1000,
-            "qWidth": 3
+            "qWidth": dims.length + 1
           }
         ]
       }
     };
 
-    $('.dimensions option:selected').each(function() {
-      dims.push($(this).text());
+    var dimHistory = '';
+    for(var d = 0; d < dims1.length; d++) {
+
+      if(dimHistory == '') {
+        dimHistory += dims1[d];
+      } else {
+        dimHistory += ',' + dims1[d];
+      }
+
       cubedef.qHyperCubeDef.qDimensions.push(
-      {
-        "qLibraryId": "",
+      { "qLibraryId": "",
         "qNullSuppression": false,
         "qDef": {
           "qGrouping": "N",
-          "qFieldDefs": [
-            $(this).text()
-          ],
-          "qFieldLabels": [
-            ""
-          ]
-        }
-      });
-
-    });
+          "qFieldDefs": [ dims[d] ],
+          "qFieldLabels": [ "" ] }
+       });
+    }
 
 activeApp.createSessionObject(cubedef).then(function(obj) {
   obj.getLayout().then(function(layout) {
     var row = layout.qHyperCube.qDataPages[0].qMatrix;
+    //console.log(layout.qHyperCube);
     $('#result').html('');
 
-    res = '<table class="sortable" id="resultTable" style="white-space: nowrap"><thead><tr>';
+    res = '<table class="tablesorter" id="resultTable" style="white-space: nowrap"><thead><tr>';
     for(var i = 0; i < dims.length; i++) {
       res += '<th>'+ dims[i] +'</th>';
     }
@@ -177,14 +187,45 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
       for(var d = 0; d < dr.length; d++) {
         res += '<td>'+dr[d].qText+'</td>';
       }
-
       res += '</tr>';
     }
 
     res += '</tbody></table>';
+    res += 'TIP! Sort multiple columns simultaneously by holding down the shift key and clicking a second, third or even fourth column header!<br/>';
     $('#result').html(res);
+    $("#resultTable").tablesorter();
+    $('#histinner').append('<div>Dimensions: ' + dimHistory + ' Expression: ' + expr +' <a href="#" class="historyValue">Re-use</a>&nbsp;<a href="#" class="historyValueRemove">Remove</a></div>');
 
+    $( ".historyValueRemove" ).click(function() {
+      $(this).parent().remove();
+    });
+
+    $( ".historyValue" ).click(function() {
+      var hist = $(this).parent().text();
+      var histDimensions = hist.substring(0, hist.indexOf('Expression')).trim().replace('Dimensions: ', '').trim().split(',')
+      
+      var histExpression = hist.substring(hist.indexOf('Expression: ')).replace('Expression: ','').trim().replace(/ /ig,"").replace('Re-use', '').replace('Remove', '').trim();
+      $('#newOptions').remove();
+
+      if(histDimensions[0] == 'Dimensions:') {
+        $("#dimensions").val('-- Empty dimension --');
+      } else {
+        $("#dimensions").val(histDimensions[0]);
+      }
+      for(var d = 1; d < histDimensions.length; d++) {
+        $('#dimensions').clone().attr('id', 'newOptions').appendTo('#dims');
+        $('#dims select').last().val(histDimensions[d]);
+      }
+
+      $('#expression').val(histExpression);
+
+    });
+
+  }, function(error) {
+    console.log(error);
   });
+}, function(error) {
+  console.log(error);
 });
 
 
@@ -227,7 +268,7 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
     }
 
     for(var a = 0; a < allFields.length; a++) {
-      $('#dimensions').append($("<option />").val('').text(allFields[a]));
+      $('#dimensions').append($("<option />").val(allFields[a]).text(allFields[a]));
     }
   }
 
@@ -262,6 +303,15 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
     }
   });
 
+  $( "#history" ).on( "click", function() {
+    var container = $( "#histcontainer" );
+     if (container.is( ":visible" )){
+         container.slideUp( 500 );
+     } else {
+         container.slideDown( 500 );
+     }
+  });
+
   $( "#calculate" ).on( "click", function() {
     $('#result').html();
     RunCalculation();
@@ -275,4 +325,6 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
   $( "#qdocopen" ).on( "click", function() {
     OpenDoc();
   });
+
+
 });
