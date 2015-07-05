@@ -203,7 +203,7 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
     $( ".historyValue" ).click(function() {
       var hist = $(this).parent().text();
       var histDimensions = hist.substring(0, hist.indexOf('Expression')).trim().replace('Dimensions: ', '').trim().split(',')
-      
+
       var histExpression = hist.substring(hist.indexOf('Expression: ')).replace('Expression: ','').trim().replace(/ /ig,"").replace('Re-use', '').replace('Remove', '').trim();
       $('#newOptions').remove();
 
@@ -326,5 +326,15 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
     OpenDoc();
   });
 
-
+  $( "#export" ).on( "click", function() {
+    var exportData = $('#resultTable').table2CSV({delivery:'value'});
+    var file = new Blob([exportData]);
+    var link = document.createElement("a");
+    link.href = window.URL.createObjectURL(file);
+    link.download = 'ExportData.csv';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    delete link;
+  });
 });

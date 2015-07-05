@@ -1,6 +1,6 @@
 {
     "name": "Qlik Sense Console",
-    "version": "0.8.5",
+    "version": "0.9.0",
     "description": "Run calculations agains Qlik Sense (desktop and server) from Chrome Dev Tools",
     "devtools_page": "devtools.html",
     "permissions": [
