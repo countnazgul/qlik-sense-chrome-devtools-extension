@@ -18,6 +18,7 @@ $( document ).ready(function() {
   $('#loadingdims').hide();
   $('#loadingqsversion').show();
   $('#qsconnecting').show();
+  $('#export').prop('disabled', true);
 
   $('textarea#expression').focus(function() {
      if($(this).val() === 'Expression') {
@@ -195,7 +196,7 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
     $('#result').html(res);
     $("#resultTable").tablesorter();
     $('#histinner').append('<div>Dimensions: ' + dimHistory + ' Expression: ' + expr +' <a href="#" class="historyValue">Re-use</a>&nbsp;<a href="#" class="historyValueRemove">Remove</a></div>');
-
+    $('#export').prop('disabled', false);
     $( ".historyValueRemove" ).click(function() {
       $(this).parent().remove();
     });
@@ -314,6 +315,7 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
 
   $( "#calculate" ).on( "click", function() {
     $('#result').html();
+    $('#export').prop('disabled', true);
     RunCalculation();
   });
 
