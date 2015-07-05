@@ -26,11 +26,19 @@ Chrome Dev Tools seems the right place for this actions (or Chrome App but this 
 ### Future development
 
 * error messages
-* multiple dimensions
-* view calculations history and option to re-execute them
-* sorting the result table
-* export the results
+* ~~multiple dimensions~~ (v0.9.1)
+* ~~view calculations history and option to re-execute them~~ (v0.9.1)
+* ~~sorting the result table~~ (v0.9.1)
+* ~~export the results~~ (v0.9.1)
 * different visualizations?
+
+### Change log
+0.9.1
+  * multiple dimensions
+  * history - track each calculation execution. option to reuse them
+  * result table design is changed
+  * result table is sortable (multiple column sort is possible holding the Shift key)
+  * option to export/download the result table
 
 ### Reminder!
 
