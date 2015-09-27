@@ -33,6 +33,9 @@ Chrome Dev Tools seems the right place for this actions (or Chrome App but this 
 * different visualizations?
 
 ### Change log
+0.10.x
+  * Sessions Apps
+
 0.9.1
   * multiple dimensions
   * history - track each calculation execution. option to reuse them

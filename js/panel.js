@@ -6,7 +6,7 @@ var app = '';
 
 $( document ).ready(function() {
 
-
+  $("#usual1 ul").idTabs(); 
 
   $('texta  rea#expression').val('Expression');
   $('#dimensions').append($("<option />").val('-- Empty dimension --').text('-- Empty dimension --'));
@@ -51,6 +51,7 @@ $( document ).ready(function() {
       server = url.substring(url.indexOf('://') + 3, url.indexOf('/',url.indexOf('://') + 3));
       app = url.substring(url.indexOf('app/') + 4, url.indexOf('/',url.indexOf('app/') + 4));
       $('#qsserver').text(server);
+      $('#qsserver_session').val(server);      
       $('#qsdoc').text(decodeURIComponent(app));
       $('#qdocopen').prop('disabled', false);
     } else {
@@ -68,13 +69,19 @@ $( document ).ready(function() {
 
   qsocks.Connect(config).then(function(global) {
     qsGlobal = global;
-      global.qvVersion().then(function(version) {
+    
+     // global.openDoc('Sales Discovery').then(function(app) {
+      //  console.log(app)
+     // })
+    
+      global.productVersion().then(function(version) {
+        console.log(version)
         $('#qdocopen').prop('disabled', false);
         $('#qsconnectingerror').hide();
         $('#loadingqsversion').hide();
         $('#qsconnecting').hide();
         $('#qsversion').text('');
-        $('#qsversion').text('(QS Version: ' + version + ')');
+        $('#qsversion').text('(QS Version: ' + version + ')');        
       });
     });
 });
@@ -274,12 +281,14 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
   }
 
   function OpenDoc() {
-      $('#loadingdims').show();
-      qsGlobal.openDoc(app).then(function(doc) {
+      $('#loadingdims').show();     
+      qsGlobal.openDoc('Sales Discovery').then(function(doc) { //app
+        console.log(doc)
+        
         activeApp = doc;
-
+        
         doc.getAppProperties().then(function(props) {
-          // /console.log(props);
+          console.log(props);
           $('#qsdoc').text(props.qTitle);
             $('#loadingdims').hide();
             $('#dimensions').prop('disabled', false);
@@ -288,6 +297,7 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
         });
 
         doc.getTablesAndKeys({"qcx": 1000,"qcy": 1000},{"qcx": 0,"qcy": 0},30,true,false).then(function(docDataObjects) {
+          console.log(docDataObjects)
           GetFields(docDataObjects);
         });
       });
@@ -339,4 +349,53 @@ activeApp.createSessionObject(cubedef).then(function(obj) {
     link.click();
     delete link;
   });
+  
+    $('#loadscript_session').focus(function () {
+      $(this).animate({ height: "15em" }, 500); 
+  });
+  
+  $('#loadscript_session').focusout(function () {
+      $(this).animate({ height: "2em" }, 500); 
+  });
+  
+  var gSessionApp = '';
+  $( "#qdoccreate_session" ).on( "click", function() {
+    var config = {
+      host: server, // + '123',
+      isSecure: isSecure
+    };
+    
+    
+    //qsocks.Connect(config).then(function (global) {
+      qsGlobal.createSessionApp().then(function (sessionApp) {
+        console.log(sessionApp);
+        gSessionApp = sessionApp;
+        sessionApp.getProperties().then(function (sessionAppProps) {
+          $( '#qsdoc_session' ).text(sessionAppProps.qAppProperties.qTitle);
+          sessionApp.setScript( $( '#loadscript_session' ).val() ).then( function() {
+            sessionApp.doReload().then( function(status) {
+              console.log(status);
+              
+            })
+          })
+        });
+      });
+    //});
+  });
+  
+    $( "#qdocreload_session" ).on( "click", function() {
+      gSessionApp.setScript( $( '#loadscript_session' ).val() ).then( function() {
+        gSessionApp.checkScriptSyntax().then( function( scriptStatus ) {
+          console.log( scriptStatus );
+          if( scriptStatus.length > 0 ) {
+            gSessionApp.doReload().then(function (status) {
+              console.log(status);
+            });
+          } else {
+            console.log(scriptStatus)
+          }
+       });
+     });
+  });
+  
 });

@@ -1,0 +1,32 @@
+/*  idTabs ~ Sean Catchpole  */
+
+
+/* Style for Usual tabs */
+.usual li { list-style:none; float:left; }
+
+.usual ul {
+  padding-left: 0px;
+  padding-bottom: 1px; 
+}
+
+.usual ul a {
+  padding:6px 10px;
+  text-decoration:none!important;
+  margin:1px;
+  margin-left:0;
+  font:10px Verdana;
+  color:#FFF;
+  background:#444;
+}
+.usual ul a:hover {
+  color:#FFF;
+  background:#111;
+  }
+.usual ul a.selected {
+  margin-bottom:0;
+  color:#000;
+  background:snow;
+  border-bottom:1px solid snow;
+  cursor:default;
+  }
+

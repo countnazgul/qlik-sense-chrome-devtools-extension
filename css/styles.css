@@ -39,3 +39,9 @@ body, input, textarea, button, select {
   margin-left: 5px;
   margin-top: 5px;
 }
+
+.expand {
+    height: 2em;
+    width: 100%;
+    padding: 3px;
+}
